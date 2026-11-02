@@ -3,9 +3,11 @@ import axios from "axios";
 
 const API_URL = "http://localhost:5000/tasks";
 
-// Get all tasks
-export const getTasks = () => {
-  return axios.get(API_URL);
+// Get tasks with optional filtering and sorting
+export const getTasks = (filters = {}) => {
+  return axios.get(API_URL, {
+    params: filters
+  });
 };
 
 // Create a task
