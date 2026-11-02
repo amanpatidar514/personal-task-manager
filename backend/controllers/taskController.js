@@ -228,11 +228,43 @@ const updateTask = async (req, res, next) => {
 };
 
 
+const deleteTask = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    // Validate task ID
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({
+        message: "Invalid task ID"
+      });
+    }
+
+    // Find and delete task
+    const task = await Task.findByIdAndDelete(id);
+
+    // Check whether task exists
+    if (!task) {
+      return res.status(404).json({
+        message: "Task not found"
+      });
+    }
+
+    res.status(200).json({
+      message: "Task deleted successfully",
+      task
+    });
+
+  } catch (error) {
+    next(error);
+  }
+};
+
 
 
 module.exports = {
   createTask,
   getTasks,
   getTaskById,
-  updateTask
+  updateTask,
+  deleteTask
 };
