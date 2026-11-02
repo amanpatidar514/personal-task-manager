@@ -2,7 +2,14 @@
 const errorMiddleware = (err, req, res, next) => {
   console.error(err.message);
 
-  // Mongoose validation error
+  // Invalid JSON request
+  if (err instanceof SyntaxError && err.status === 400 && "body" in err) {
+    return res.status(400).json({
+      message: "Invalid JSON format"
+    });
+  }
+
+  // Mongoose validation or ID errors
   if (err.name === "ValidationError" || err.name === "CastError") {
     return res.status(400).json({
       message: err.message
