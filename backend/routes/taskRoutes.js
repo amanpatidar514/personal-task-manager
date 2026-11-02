@@ -4,7 +4,8 @@ const router = express.Router();
 const {
   createTask,
   getTasks,
-  getTaskById
+  getTaskById,
+  updateTask
 } = require("../controllers/taskController");
 
 // GET /tasks
@@ -15,5 +16,8 @@ router.get("/:id", getTaskById);
 
 // POST /tasks
 router.post("/", createTask);
+
+// PUT /tasks/:id
+router.put("/:id", updateTask);
 
 module.exports = router;

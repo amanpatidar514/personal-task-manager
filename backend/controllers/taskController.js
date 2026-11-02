@@ -151,9 +151,88 @@ const getTaskById = async (req, res, next) => {
 };
 
 
+const updateTask = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const {
+      title,
+      description,
+      priority,
+      status,
+      dueDate
+    } = req.body || {};
+
+    // Validate task ID
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({
+        message: "Invalid task ID"
+      });
+    }
+
+    // Check whether at least one field is provided
+    if (
+      title === undefined &&
+      description === undefined &&
+      priority === undefined &&
+      status === undefined &&
+      dueDate === undefined
+    ) {
+      return res.status(400).json({
+        message: "At least one field is required to update"
+      });
+    }
+
+    // Validate title if provided
+    if (title !== undefined && (
+      typeof title !== "string" || !title.trim()
+    )) {
+      return res.status(400).json({
+        message: "Task title cannot be empty"
+      });
+    }
+
+    // Find and update task
+    const task = await Task.findByIdAndUpdate(
+      id,
+      {
+        $set: {
+          ...(title !== undefined && { title: title.trim() }),
+          ...(description !== undefined && { description }),
+          ...(priority !== undefined && { priority }),
+          ...(status !== undefined && { status }),
+          ...(dueDate !== undefined && { dueDate })
+        }
+      },
+      {
+        new: true,
+        runValidators: true
+      }
+    );
+
+    // Check whether task exists
+    if (!task) {
+      return res.status(404).json({
+        message: "Task not found"
+      });
+    }
+
+    res.status(200).json({
+      message: "Task updated successfully",
+      task
+    });
+
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+
 
 module.exports = {
   createTask,
   getTasks,
-  getTaskById
+  getTaskById,
+  updateTask
 };
